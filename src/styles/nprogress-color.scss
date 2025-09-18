@@ -1,0 +1,34 @@
+#nprogress {
+  .bar {
+    height: 3px;
+
+    /* 柔和彩虹渐变色 */
+    background: linear-gradient(
+      90deg,
+      #ff6b6b,
+      /* 柔和红 */ #ffa36c,
+      /* 橙色偏柔 */ #fff56c,
+      /* 柔和黄 */ #6bff8a,
+      /* 柔和绿 */ #6cd2ff,
+      /* 浅蓝 */ #a36cff,
+      /* 紫色 */ #ff6bf2 /* 粉紫 */
+    );
+
+    background-size: 400% 100%; /* 放大背景以便滚动 */
+    border-radius: 2px;
+    animation: rainbow 2.5s linear infinite; /* 无限滚动，速度稍慢更舒适 */
+  }
+
+  .spinner {
+    display: none; /* 隐藏旋转图标 */
+  }
+}
+
+@keyframes rainbow {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 100% 0%;
+  }
+}
