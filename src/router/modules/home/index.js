@@ -1,9 +1,9 @@
-const homeRoutes = [
+export const constantRoutes = [
   {
     path: "/login",
     name: "Login",
     component: () => import("@/views/Login/index.vue"),
-    meta: { title: "登录", hidden: true },
+    meta: { title: "登录", hidden: true }, // hidden: true 表示不在菜单中显示
   },
   {
     path: "/",
@@ -11,91 +11,112 @@ const homeRoutes = [
     redirect: "/home",
     children: [
       {
-        path: "/home",
+        // 使用相对路径，它会自动拼接在父路由 "/" 后面，解析为 "/home"
+        path: "home",
         name: "Home",
         component: () => import("@/views/Home/index.vue"),
         meta: { title: "首页", icon: "HomeFilled" },
       },
+    ],
+  },
+  // 404 页面、500 页面等也应放在这里
+];
+
+export const asyncRoutes = [
+  {
+    path: "/user",
+    component: () => import("@/layout/index.vue"), // 多级菜单的父级需要一个布局组件
+    redirect: "/user/admin",
+    meta: { title: "用户管理", icon: "User", permission: "user:manage" }, // 父级菜单的权限标识
+    children: [
       {
-        path: "/user",
-        name: "UserManagement",
-        redirect: "/user/admin",
-        meta: { title: "用户管理", icon: "User" },
-        children: [
-          {
-            path: "/admin",
-            name: "AdminUser",
-            component: () => import("@/views/user/admin/index.vue"),
-            meta: { title: "管理员用户", icon: "UserFilled" },
-          },
-          {
-            path: "/normal",
-            name: "NormalUser",
-            component: () => import("@/views/user/normal/index.vue"),
-            meta: { title: "普通用户", icon: "User" },
-          },
-        ],
+        path: "admin",
+        name: "AdminUser",
+        component: () => import("@/views/user/admin/index.vue"),
+        meta: { title: "管理员用户", icon: "UserFilled", permission: "user:admin:view" },
       },
       {
-        path: "/dream",
+        path: "role",
+        name: "SystemRoleManagement",
+        component: () => import("@/views/user/role/index.vue"),
+        meta: { title: "角色管理", icon: "Avatar", permission: "user:role:manage" },
+      },
+      {
+        path: "normal",
+        name: "NormalUser",
+        component: () => import("@/views/user/normal/index.vue"),
+        meta: { title: "普通用户", icon: "User", permission: "user:normal:view" },
+      },
+    ],
+  },
+  {
+    path: "/dream",
+    component: () => import("@/layout/index.vue"), // 单级菜单同样需要布局组件，以确保显示在主框架内
+    children: [
+      {
+        path: "", // path 为空，意味着访问 /dream 时就渲染此组件
         name: "DreamManagement",
         component: () => import("@/views/dream/index.vue"),
-        meta: { title: "梦境管理", icon: "Moon" },
+        meta: { title: "梦境管理", icon: "Moon", permission: "dream:manage" },
       },
+    ],
+  },
+  {
+    path: "/community",
+    component: () => import("@/layout/index.vue"),
+    children: [
       {
-        path: "/community",
+        path: "",
         name: "CommunityManagement",
         component: () => import("@/views/community/index.vue"),
-        meta: { title: "社区管理", icon: "ChatDotSquare" },
+        meta: { title: "社区管理", icon: "ChatDotSquare", permission: "community:manage" },
+      },
+    ],
+  },
+  {
+    path: "/ops",
+    component: () => import("@/layout/index.vue"),
+    redirect: "/ops/report",
+    meta: { title: "运营管理", icon: "Opportunity", permission: "ops:manage" },
+    children: [
+      {
+        path: "report",
+        name: "ReportManagement",
+        component: () => import("@/views/ops/report/index.vue"),
+        meta: { title: "报告管理", icon: "Document", permission: "ops:report:view" },
       },
       {
-        path: "/ops",
-        name: "OperationsManagement",
-        redirect: "/ops/report",
-        meta: { title: "运营管理", icon: "Opportunity" },
-        children: [
-          {
-            path: "/report",
-            name: "ReportManagement",
-            component: () => import("@/views/ops/report/index.vue"),
-            meta: { title: "报告管理", icon: "Document" },
-          },
-          {
-            path: "/vip",
-            name: "VipManagement",
-            component: () => import("@/views/ops/vip/index.vue"),
-            meta: { title: "VIP管理", icon: "UserFilled" },
-          },
-          {
-            path: "/statistics",
-            name: "DataStatistics",
-            component: () => import("@/views/ops/statistics/index.vue"),
-            meta: { title: "数据统计", icon: "PieChart" },
-          },
-        ],
+        path: "vip",
+        name: "VipManagement",
+        component: () => import("@/views/ops/vip/index.vue"),
+        meta: { title: "VIP管理", icon: "UserFilled", permission: "ops:vip:manage" },
       },
       {
-        path: "/system",
-        name: "SystemManagement",
-        redirect: "/system/ai-config",
-        meta: { title: "系统管理", icon: "Tools" },
-        children: [
-          {
-            path: "/ai-config",
-            name: "AiConfig",
-            component: () => import("@/views/system/ai-config/index.vue"),
-            meta: { title: "AI配置", icon: "Cpu" },
-          },
-          {
-            path: "/config",
-            name: "SystemConfig",
-            component: () => import("@/views/system/config/index.vue"),
-            meta: { title: "系统配置", icon: "Setting" },
-          },
-        ],
+        path: "statistics",
+        name: "DataStatistics",
+        component: () => import("@/views/ops/statistics/index.vue"),
+        meta: { title: "数据统计", icon: "PieChart", permission: "ops:stats:view" },
+      },
+    ],
+  },
+  {
+    path: "/system",
+    component: () => import("@/layout/index.vue"),
+    redirect: "/system/ai-config",
+    meta: { title: "系统管理", icon: "Tools", permission: "system:manage" },
+    children: [
+      {
+        path: "ai-config",
+        name: "AiConfig",
+        component: () => import("@/views/system/ai-config/index.vue"),
+        meta: { title: "AI配置", icon: "Cpu", permission: "system:ai:config" },
+      },
+      {
+        path: "config",
+        name: "SystemConfig",
+        component: () => import("@/views/system/config/index.vue"),
+        meta: { title: "系统配置", icon: "Setting", permission: "system:sys:config" },
       },
     ],
   },
 ];
-
-export default homeRoutes;

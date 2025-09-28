@@ -1,12 +1,13 @@
 import { createRouter, createWebHistory } from "vue-router";
-import homeRoutes from "./modules/home";
+import { constantRoutes } from "./modules/home/index.js";
 import { useUserStore } from "@/store/modules/user";
 import { start, close } from "@/utils/nporgress";
 import { ElMessage } from "element-plus";
+import { usePermissionStore } from "@/store/modules/permission";
 
 const router = createRouter({
   history: createWebHistory(),
-  routes: [...homeRoutes],
+  routes: constantRoutes,
 });
 
 // 添加路由守卫
@@ -16,13 +17,37 @@ router.beforeEach(async (to, from, next) => {
   start(); // 开启进度条
   const userStore = useUserStore();
   const token = userStore.token;
+  const permissionStore = usePermissionStore();
   if (token) {
     if (to.path === "/login") {
       // 如果已登录，访问登录页则重定向到首页
       next({ path: "/" });
     } else {
-      // 如果有 token, 正常访问
-      next();
+      if (userStore.userInfo) {
+        next(); // 如果有用户信息，直接放行
+      } else {
+        try {
+          // 异步获取用户信息（包含权限）
+          const userInfo = await userStore.getInfo();
+          const permissions = userInfo.permissions;
+          // 根据权限生成动态路由
+          const permissionStore = usePermissionStore();
+          const accessRoutes = await permissionStore.generateRoutes(permissions);
+
+          // 动态添加路由
+          accessRoutes.forEach((route) => {
+            router.addRoute(route);
+          });
+
+          // 确保路由完全添加后，再进行跳转
+          next({ ...to, replace: true });
+        } catch (error) {
+          // 如果出错，则登出并重新登录
+          await userStore.logout();
+          ElMessage.error(error.message || "获取权限失败，请重新登录");
+          next(`/login?redirect=${to.path}`);
+        }
+      }
     }
   } else {
     // 没有 token

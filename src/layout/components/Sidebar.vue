@@ -1,12 +1,12 @@
 <script setup>
-import { useRouter } from "vue-router";
 import { useSettingStore } from "@/store/modules/setting";
 import MenuItem from "./MenuItem.vue";
+import { usePermissionStore } from "@/store/modules/permission";
 
-const router = useRouter();
 const settingStore = useSettingStore();
+const permissionStore = usePermissionStore();
 
-const menuRoutes = router.options.routes.find((route) => route.path === "/")?.children || [];
+const menuRoutes = computed(() => permissionStore.routes);
 </script>
 
 <template>

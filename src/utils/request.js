@@ -44,6 +44,7 @@ request.interceptors.response.use(
     if (status) {
       switch (status) {
         case 401:
+          const userStore = useUserStore();
           msg = "登录状态失效，请重新登录";
           if (!document.querySelector(".el-message-box__wrapper")) {
             ElMessageBox.confirm(msg, "系统提示", {
