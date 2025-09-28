@@ -8,6 +8,11 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    Admin: typeof import('./../views/user/admin/index.vue')['default']
+    AiConfig: typeof import('./../views/system/ai-config/index.vue')['default']
+    Community: typeof import('./../views/community/index.vue')['default']
+    Config: typeof import('./../views/system/config/index.vue')['default']
+    Dream: typeof import('./../views/dream/index.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
     ElDatePicker: typeof import('element-plus/es')['ElDatePicker']
@@ -20,7 +25,9 @@ declare module 'vue' {
     ElInput: typeof import('element-plus/es')['ElInput']
     ElMenu: typeof import('element-plus/es')['ElMenu']
     ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
+    ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
     Home: typeof import('./../views/Home/index.vue')['default']
+    IEpArrowDown: typeof import('~icons/ep/arrow-down')['default']
     IEpCheck: typeof import('~icons/ep/check')['default']
     IEpEdit: typeof import('~icons/ep/edit')['default']
     IEpExpand: typeof import('~icons/ep/expand')['default']
@@ -33,8 +40,12 @@ declare module 'vue' {
     IEpUser: typeof import('~icons/ep/user')['default']
     IEpUserFilled: typeof import('~icons/ep/user-filled')['default']
     Login: typeof import('./../views/Login/index.vue')['default']
+    Normal: typeof import('./../views/user/normal/index.vue')['default']
+    Report: typeof import('./../views/ops/report/index.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Statistics: typeof import('./../views/ops/statistics/index.vue')['default']
     SvgIcon: typeof import('./../components/SvgIcon/index.vue')['default']
+    Vip: typeof import('./../views/ops/vip/index.vue')['default']
   }
 }

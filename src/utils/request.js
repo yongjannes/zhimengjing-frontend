@@ -1,5 +1,5 @@
 import axios, { AxiosHeaders } from "axios";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { useUserStore } from "@/store/modules/user";
 
 // 创建 axios 实例
@@ -45,6 +45,23 @@ request.interceptors.response.use(
       switch (status) {
         case 401:
           msg = "登录状态失效，请重新登录";
+          if (!document.querySelector(".el-message-box__wrapper")) {
+            ElMessageBox.confirm(msg, "系统提示", {
+              confirmButtonText: "重新登录",
+              cancelButtonText: "取消",
+              type: "warning",
+            })
+              .then(() => {
+                // 用户点击“重新登录”后，调用 store 中的 logout 方法
+                userStore.logout().then(() => {
+                  // 为了清空所有状态并重新初始化路由，直接刷新页面并跳转是最好的方式
+                  window.location.href = "/login";
+                });
+              })
+              .catch(() => {
+                // 用户点击“取消”
+              });
+          }
           break;
         case 403:
           msg = "无权访问";

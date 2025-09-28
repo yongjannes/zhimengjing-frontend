@@ -16,7 +16,7 @@ const settingStore = useSettingStore();
       <el-dropdown trigger="click">
         <span class="avatar-wrapper">
           <img src="@/assets/vue.svg" class="user-avatar" />
-          <el-icon class="el-icon--right"><arrow-down /></el-icon>
+          <el-icon class="el-icon--right"><i-ep-arrow-down /></el-icon>
         </span>
         <template #dropdown>
           <el-dropdown-menu>

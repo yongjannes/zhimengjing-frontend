@@ -1,4 +1,8 @@
 <script setup>
+import { onMounted } from "vue";
+import { useUserStore } from "@/store/modules/user";
+
+const userStore = useUserStore();
 const open1 = () => {
   ElNotification({
     title: "Success",
@@ -6,6 +10,9 @@ const open1 = () => {
     type: "success",
   });
 };
+onMounted(() => {
+  userStore.getInfo();
+});
 </script>
 <template>
   <div>H1</div>
