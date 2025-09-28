@@ -1,5 +1,6 @@
 import axios, { AxiosHeaders } from "axios";
 import { ElMessage } from "element-plus";
+import { useUserStore } from "@/store/modules/user";
 
 // 创建 axios 实例
 const request = axios.create({
@@ -10,7 +11,8 @@ const request = axios.create({
 // 请求拦截器
 request.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const userStore = useUserStore();
+    const token = userStore.token;
     if (token) {
       // 确保 headers 不为 undefined，并用 AxiosHeaders 包装
       config.headers = new AxiosHeaders(config.headers ?? {});

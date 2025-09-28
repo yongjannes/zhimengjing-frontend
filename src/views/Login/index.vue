@@ -2,12 +2,14 @@
 import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import AuthAPI from "@/api/auth";
+import { useUserStore } from "@/store/modules/user";
 
 const router = useRouter();
+const userStore = useUserStore();
 
 const loginForm = ref({
-  username: "",
-  password: "",
+  username: "admin",
+  password: "123456",
   captcha: "",
   captchaKey: "",
 });
@@ -41,22 +43,15 @@ const handleLogin = async () => {
 
     loading.value = true;
 
-    const res = await AuthAPI.login(
-      loginForm.value.username,
-      loginForm.value.password,
-      loginForm.value.captcha,
-      loginForm.value.captchaKey,
-    );
-
-    if (res?.token) {
-      localStorage.setItem("token", res.token);
+    const res = await userStore.login(loginForm.value);
+    if (res) {
+      ElMessage.success("登录成功");
+      router.push({ path: "/" });
+    } else {
+      // 登录失败，store action 返回 false
+      // 错误提示已由 axios 拦截器处理，这里只需刷新验证码
+      await getCaptcha();
     }
-
-    ElMessage.success("登录成功");
-    router.push({ path: "/" });
-  } catch (error) {
-    ElMessage.error(error.message || "登录失败");
-    await getCaptcha();
   } finally {
     loading.value = false;
   }

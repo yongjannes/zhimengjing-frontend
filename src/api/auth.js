@@ -26,6 +26,21 @@ const AuthAPI = {
       },
     });
   },
+
+  // 获取当前登录管理员信息
+  getInfo() {
+    return request({
+      url: "/admin/auth/info",
+      method: "GET",
+    });
+  },
+  // 退出登录
+  logout() {
+    return request({
+      url: "/admin/auth/logout",
+      method: "POST",
+    });
+  },
 };
 
 export default AuthAPI;
