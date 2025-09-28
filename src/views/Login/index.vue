@@ -1,157 +1,337 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
 import AuthAPI from "@/api/auth";
-import { useUserStore } from "@/store/modules/user";
 
-// 用户 store
-const userStore = useUserStore();
+const router = useRouter();
 
-// 表单数据
-const userAccount = ref("");
-const password = ref("");
-const captcha = ref("");
-const captchaId = ref("");
+const loginForm = ref({
+  username: "",
+  password: "",
+  captcha: "",
+  captchaKey: "",
+});
 
-// 验证码图片
-const captchaImage = ref("");
+const captchaImg = ref("");
 
-// 加载状态与错误提示
+const loginRules = {
+  username: [{ required: true, trigger: "blur", message: "请输入用户名" }],
+  password: [{ required: true, trigger: "blur", message: "请输入密码" }],
+  captcha: [{ required: true, trigger: "blur", message: "请输入验证码" }],
+};
+
 const loading = ref(false);
-const errorMsg = ref("");
+const loginFormRef = ref(null);
 
-// 获取验证码
-async function fetchCaptcha() {
+const getCaptcha = async () => {
   try {
-    const result = await AuthAPI.getCaptcha();
-    // 保存验证码 ID（隐藏，不显示给用户）
-    captchaId.value = result.captchaId || "";
-    // 保存验证码图片 URL，直接赋值
-    captchaImage.value = result.captchaImage || "";
-  } catch (err) {
-    errorMsg.value = err.message || "获取验证码失败";
+    const response = await AuthAPI.getCaptcha(loginForm.value.uuid);
+    captchaImg.value = response.captchaImage;
+    loginForm.value.captchaKey = response.captchaId;
+  } catch (error) {
+    ElMessage.error(error.message || "获取验证码失败");
   }
-}
+};
 
-// 登录
-async function handleLogin() {
-  errorMsg.value = "";
-  loading.value = true;
+const handleLogin = async () => {
+  if (!loginFormRef.value) return;
   try {
-    await userStore.login({
-      userAccount: userAccount.value,
-      password: password.value,
-      captchaId: captchaId.value, // 隐藏的验证码ID
-      captcha: captcha.value, // 用户输入的验证码内容
-    });
-    window.location.href = "/";
-  } catch (err) {
-    errorMsg.value = err.message || "登录失败";
-    // 登录失败刷新验证码
-    await fetchCaptcha();
+    const valid = await loginFormRef.value.validate();
+    if (!valid) return;
+
+    loading.value = true;
+
+    const res = await AuthAPI.login(
+      loginForm.value.username,
+      loginForm.value.password,
+      loginForm.value.captcha,
+      loginForm.value.captchaKey,
+    );
+
+    if (res?.token) {
+      localStorage.setItem("token", res.token);
+    }
+
+    ElMessage.success("登录成功");
+    router.push({ path: "/" });
+  } catch (error) {
+    ElMessage.error(error.message || "登录失败");
+    await getCaptcha();
   } finally {
     loading.value = false;
   }
-}
+};
 
-// 页面加载时获取验证码
 onMounted(() => {
-  fetchCaptcha();
+  getCaptcha();
 });
 </script>
 
 <template>
-  <div class="button-row">
-    <el-button>Default</el-button>
-    <el-button type="primary">Primary</el-button>
-    <el-button type="success">Success</el-button>
-    <el-button type="info">Info</el-button>
-    <el-button type="warning">Warning</el-button>
-    <el-button type="danger">Danger</el-button>
-  </div>
+  <div class="login-container">
+    <!-- 主登录卡片 -->
+    <div class="login-card">
+      <!-- 头部标题 -->
+      <div class="card-header">
+        <h1 class="title">欢迎回来</h1>
+      </div>
 
-  <div class="block">
-    <span class="demonstration">Months</span>
-    <el-date-picker type="months" placeholder="Pick one or more months" />
-  </div>
+      <el-form
+        ref="loginFormRef"
+        :model="loginForm"
+        :rules="loginRules"
+        class="login-form"
+        auto-complete="off"
+        label-position="top"
+      >
+        <el-form-item prop="username">
+          <div class="input-group" style="width: 320px">
+            <el-input v-model="loginForm.username" placeholder="用户名" class="custom-input" />
+            <el-icon class="input-icon"><i-ep-User /></el-icon>
+          </div>
+        </el-form-item>
+        <el-form-item prop="password">
+          <div class="input-group" style="width: 320px">
+            <el-input
+              v-model="loginForm.password"
+              type="password"
+              placeholder="密码"
+              class="custom-input"
+              @keyup.enter="handleLogin"
+            />
+            <el-icon class="input-icon"><i-ep-Lock /></el-icon>
+          </div>
+        </el-form-item>
 
-  <el-button type="primary"><i-ep-edit />编辑</el-button>
-  <el-button type="success"><i-ep-check />成功</el-button>
+        <el-form-item prop="captcha">
+          <div class="captcha-wrapper">
+            <div class="input-group captcha-input">
+              <el-input
+                v-model="loginForm.captcha"
+                placeholder="请输入验证码"
+                class="custom-input"
+              />
+              <el-icon class="input-icon"><i-ep-Key /></el-icon>
+            </div>
+            <div class="captcha-img-wrapper" @click="getCaptcha">
+              <img :src="captchaImg" class="captcha-img" alt="验证码" />
+              <div class="refresh-overlay">
+                <el-icon><Refresh /></el-icon>
+              </div>
+            </div>
+          </div>
+        </el-form-item>
 
-  <div class="login-page">
-    <h2>登录</h2>
-    <div v-if="errorMsg" class="error">{{ errorMsg }}</div>
-    <div class="form-item">
-      <label>账号：</label>
-      <input v-model="userAccount" type="text" placeholder="请输入账号" />
+        <div class="login-actions">
+          <el-button
+            type="primary"
+            :loading="loading"
+            class="login-button"
+            @click.prevent="handleLogin"
+          >
+            <span v-if="!loading">登 录</span>
+            <span v-else>登录中...</span>
+          </el-button>
+        </div>
+      </el-form>
     </div>
-    <div class="form-item">
-      <label>密码：</label>
-      <input v-model="password" type="password" placeholder="请输入密码" />
-    </div>
-    <div class="form-item captcha">
-      <label>验证码：</label>
-      <input v-model="captcha" type="text" placeholder="请输入验证码" />
-      <img :src="captchaImage" alt="验证码" @click="fetchCaptcha" />
-    </div>
-    <button :disabled="loading" @click="handleLogin">{{ loading ? "登录中..." : "登录" }}</button>
   </div>
 </template>
 
-<style scoped lang="scss">
-.login-page {
-  width: 300px;
-  padding: 20px;
-  margin: 50px auto;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+<style scoped>
+/* 全局样式 */
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-family:
+    "Helvetica Neue", "Hiragino Sans GB", "WenQuanYi Micro Hei", "Microsoft Yahei", sans-serif;
+  color: #333;
+  background: url("@/assets/images/background.jpg") no-repeat;
+  background-size: cover;
+}
 
-  h2 {
-    margin-bottom: 20px;
-    text-align: center;
+/* 登录容器样式 */
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 40px;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* 标题样式 */
+.card-header .title {
+  margin-bottom: 35px;
+  font-size: 32px;
+  font-weight: 700;
+  color: #333;
+}
+
+/* 表单样式 */
+.login-form {
+  text-align: left;
+}
+
+/* 输入框组样式 - 统一布局 */
+.input-group {
+  position: relative;
+  margin-bottom: 25px;
+}
+
+.input-group .input-icon {
+  position: absolute;
+  top: 50%;
+  left: 15px;
+  z-index: 10;
+  font-size: 20px;
+  color: #999;
+  transform: translateY(-50%);
+  transition: color 0.3s ease;
+}
+
+.input-group:focus-within .input-icon {
+  color: #71b7e6;
+}
+
+/* Element Plus 输入框样式覆盖 */
+.custom-input :deep(.el-input__wrapper) {
+  height: 50px;
+  padding: 0 15px 0 50px;
+  font-size: 16px;
+  outline: none;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.custom-input :deep(.el-input__inner) {
+  height: 100%;
+  padding-left: 0;
+  line-height: 50px;
+}
+
+/* 验证码区域样式 */
+.captcha-wrapper {
+  display: flex;
+  gap: 15px;
+  align-items: stretch;
+}
+
+.captcha-input {
+  flex: 1;
+}
+
+.captcha-input :deep(.el-input__wrapper) {
+  height: 50px;
+}
+
+.captcha-img-wrapper {
+  position: relative;
+  width: 130px;
+  height: 50px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.captcha-img-wrapper:hover {
+  border-color: #71b7e6;
+  box-shadow: 0 0 10px rgba(113, 183, 230, 0.5);
+}
+
+.captcha-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.refresh-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(113, 183, 230, 0.9);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.captcha-img-wrapper:hover .refresh-overlay {
+  opacity: 1;
+}
+
+.refresh-overlay .el-icon {
+  font-size: 18px;
+  color: white;
+}
+
+/* 登录按钮样式 */
+.login-button {
+  width: 100%;
+  height: 55px;
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.login-button:hover {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  transform: translateY(-3px);
+}
+
+/* Element Plus 表单项样式覆盖 */
+:deep(.el-form-item) {
+  margin-bottom: 25px;
+}
+
+:deep(.el-form-item__label) {
+  display: none;
+}
+
+:deep(.el-form-item__error) {
+  padding-top: 5px;
+  font-size: 14px;
+  line-height: 1;
+  color: #f56c6c;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .login-container {
+    padding: 20px;
   }
 
-  .form-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 15px;
-
-    label {
-      width: 70px;
-    }
-
-    input {
-      flex: 1;
-      padding: 5px;
-    }
-
-    &.captcha {
-      img {
-        height: 38px;
-        margin-left: 10px;
-        cursor: pointer;
-      }
-    }
+  .login-card {
+    max-width: 100%;
   }
 
-  .error {
-    margin-bottom: 10px;
-    color: red;
-    text-align: center;
+  .captcha-wrapper {
+    flex-direction: column;
+    gap: 20px;
   }
 
-  button {
+  .captcha-img-wrapper {
     width: 100%;
-    padding: 8px 0;
-    color: #fff;
-    cursor: pointer;
-    background-color: #409eff;
-    border: none;
-    border-radius: 4px;
-
-    &:disabled {
-      cursor: not-allowed;
-      background-color: #a0cfff;
-    }
+    height: 55px;
   }
 }
 </style>

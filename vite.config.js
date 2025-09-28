@@ -39,6 +39,7 @@ export default defineConfig(async ({ mode }) => {
       UnoCss(), // UnoCSS 插件
       AutoImport({
         imports: ["vue"], // 自动导入 vue 的相关函数
+
         dts: "src/types/auto-imports.d.ts", // 自动生成 TypeScript 声明文件
         eslintrc: {
           enabled: true, // 自动生成 ESLint 配置

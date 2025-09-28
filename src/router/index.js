@@ -14,8 +14,8 @@ const whiteList = ["/login"]; // 不需要登录就可以访问的页面路径
 router.beforeEach(async (to, from, next) => {
   start(); // 开启进度条
   const userStore = useUserStore();
-  const token = userStore.token; // 或者直接从 localStorage 获取
-
+  //  const token = userStore.token; // 或者直接从 localStorage 获取
+  const token = localStorage.getItem("token"); // 从本地存储读取
   if (token) {
     if (to.path === "/login") {
       // 如果已登录，访问登录页则重定向到首页
