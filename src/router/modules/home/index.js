@@ -7,9 +7,17 @@ const homeRoutes = [
   },
   {
     path: "/",
-    name: "Home",
-    component: () => import("@/views/Home/index.vue"),
-    meta: { title: "首页", requiresAuth: true },
+    name: "Layout", // 给布局一个名字
+    component: () => import("@/layout/index.vue"),
+    redirect: "/home",
+    children: [
+      {
+        path: "home",
+        name: "Home",
+        component: () => import("@/views/Home/index.vue"),
+        meta: { title: "首页", icon: "HomeFilled" },
+      },
+    ],
   },
 ];
 
