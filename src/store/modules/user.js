@@ -1,5 +1,7 @@
 import { defineStore } from "pinia";
 import AuthAPI from "@/api/auth";
+import { usePermissionStore } from "@/store/modules/permission";
+import router from "@/router/index.js";
 
 export const useUserStore = defineStore(
   "user",
@@ -49,6 +51,7 @@ export const useUserStore = defineStore(
 
     // 退出登录
     const logout = async () => {
+      const permissionStore = usePermissionStore();
       try {
         await AuthAPI.logout();
       } catch (error) {
@@ -56,6 +59,8 @@ export const useUserStore = defineStore(
       } finally {
         // 无论接口调用成功与否，都清空前端登录状态
         clearLoginState();
+        permissionStore.resetRoutes();
+        router.replace("/login");
       }
     };
 
