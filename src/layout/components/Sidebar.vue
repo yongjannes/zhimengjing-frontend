@@ -11,10 +11,12 @@ const menuRoutes = computed(() => permissionStore.routes);
 
 <template>
   <div>
-    <div class="logo-container">
-      <img src="/meng.svg" class="logo" alt="Logo" />
-      <h1 v-if="!settingStore.isCollapse" class="title">织梦境</h1>
-    </div>
+    <router-link to="/home" class="sidebar-logo-link">
+      <div class="logo-container">
+        <img src="/meng.svg" class="logo" alt="Logo" />
+        <h1 v-if="!settingStore.isCollapse" class="title">织梦境</h1>
+      </div>
+    </router-link>
     <el-menu
       active-text-color="var(--el-color-primary)"
       background-color="#4f83cc"
@@ -30,6 +32,10 @@ const menuRoutes = computed(() => permissionStore.routes);
 </template>
 
 <style lang="scss" scoped>
+.sidebar-logo-link {
+  color: inherit;
+  text-decoration: none;
+}
 /* 侧边栏容器 */
 .sidebar {
   display: flex;
@@ -81,7 +87,7 @@ const menuRoutes = computed(() => permissionStore.routes);
   overflow-y: auto;
   background: linear-gradient(180deg, #4f83cc, #79a9f0);
   border-right: none;
-  transition: width 0.3s ease;
+  transition: width 0.1s ease;
 
   &::-webkit-scrollbar {
     width: 6px;
