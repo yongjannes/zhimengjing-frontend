@@ -4,13 +4,27 @@ import { useRoute } from "vue-router";
 
 const settingStore = useSettingStore();
 const route = useRoute();
+
+// 刷新页面
+const handleRefresh = () => {
+  window.location.reload();
+};
+
+// 全屏切换
+const toggleFullScreen = () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    }
+  }
+};
 </script>
 
 <template>
   <div class="navbar">
-    <!-- 左侧 -->
     <div class="navbar-left">
-      <!-- 汉堡按钮 -->
       <div class="hamburger-container" @click="settingStore.toggleCollapse">
         <el-icon>
           <i-ep-expand v-if="settingStore.isCollapse" />
@@ -18,7 +32,6 @@ const route = useRoute();
         </el-icon>
       </div>
 
-      <!-- 面包屑 -->
       <el-breadcrumb separator-icon="ArrowRight" class="breadcrumb">
         <el-breadcrumb-item
           v-for="(item, index) in route.matched"
@@ -26,18 +39,21 @@ const route = useRoute();
           :key="index"
           :to="item.path"
         >
-          <!-- 图标 -->
           <el-icon v-if="item.meta.icon" class="breadcrumb-icon">
             <component :is="item.meta.icon" />
           </el-icon>
-          <!-- 标题 -->
           <span class="breadcrumb-title">{{ item.meta.title }}</span>
         </el-breadcrumb-item>
       </el-breadcrumb>
     </div>
 
-    <!-- 右侧 -->
     <div class="right-menu">
+      <div class="right-menu-item" @click="handleRefresh">
+        <el-icon><i-ep-refresh /></el-icon>
+      </div>
+      <div class="right-menu-item" @click="toggleFullScreen">
+        <el-icon><i-ep-full-screen /></el-icon>
+      </div>
       <el-dropdown trigger="click">
         <span class="avatar-wrapper">
           <img src="@/assets/vue.svg" class="user-avatar" />
@@ -94,6 +110,8 @@ const route = useRoute();
 
 /* 右边区域 */
 .right-menu {
+  display: flex;
+  align-items: center;
   .avatar-wrapper {
     display: flex;
     align-items: center;
@@ -108,6 +126,12 @@ const route = useRoute();
     .el-icon--right {
       margin-left: 5px;
     }
+  }
+  .right-menu-item {
+    padding: 0 10px;
+    font-size: 22px;
+    color: #5a5e66;
+    cursor: pointer;
   }
 }
 </style>

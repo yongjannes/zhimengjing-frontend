@@ -2,6 +2,7 @@
 import Sidebar from "./components/Sidebar.vue";
 import Navbar from "./components/Navbar.vue";
 import AppMain from "./components/AppMain.vue";
+import Tabs from "./components/Tabs.vue";
 
 import { useSettingStore } from "@/store/modules/setting";
 
@@ -13,6 +14,7 @@ const settingStore = useSettingStore();
     <Sidebar class="sidebar-container" />
     <div class="main-container">
       <Navbar />
+      <Tabs />
       <AppMain />
     </div>
   </div>
