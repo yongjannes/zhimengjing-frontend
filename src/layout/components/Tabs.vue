@@ -1,11 +1,68 @@
 <script setup>
 import { useTabsStore } from "@/store/modules/tabs";
 import { useRoute, useRouter } from "vue-router";
-import { watch } from "vue";
 
 const store = useTabsStore();
 const route = useRoute();
 const router = useRouter();
+
+// --- 右键菜单相关 ---
+const menuVisible = ref(false);
+const menuStyle = ref({
+  left: "0px",
+  top: "0px",
+});
+const rightClickedTabPath = ref("");
+
+// 打开右键菜单
+const openMenu = (e, path) => {
+  // 只有非首页标签才显示菜单
+  if (path !== "/home") {
+    menuVisible.value = true;
+    menuStyle.value.left = e.clientX + "px";
+    menuStyle.value.top = e.clientY + "px";
+    rightClickedTabPath.value = path;
+  }
+};
+
+// 关闭右键菜单
+const closeMenu = () => {
+  menuVisible.value = false;
+};
+
+// 监听菜单可见性，用于添加/移除全局点击事件
+watch(
+  () => menuVisible.value,
+  (visible) => {
+    if (visible) {
+      document.body.addEventListener("click", closeMenu);
+    } else {
+      document.body.removeEventListener("click", closeMenu);
+    }
+  },
+);
+
+// 右键菜单操作：关闭当前
+const handleCloseCurrent = () => {
+  removeTab(rightClickedTabPath.value);
+};
+
+// 右键菜单操作：关闭其他
+const handleCloseOthers = () => {
+  store.closeOtherTabs(rightClickedTabPath.value);
+  if (route.path !== rightClickedTabPath.value) {
+    router.push(rightClickedTabPath.value);
+  }
+};
+
+// 右键菜单操作：关闭所有
+const handleCloseAll = () => {
+  store.closeAllTabs();
+  if (route.path !== "/home") {
+    router.push("/home");
+  }
+};
+// --- 右键菜单相关结束 ---
 
 const addTab = () => {
   if (route.meta.title) {
@@ -22,20 +79,16 @@ const removeTab = (targetPath) => {
   const tabsList = store.tabs;
   let newActivePath = store.activeTab;
 
-  // 如果关闭的是当前激活的标签页，则确定新的激活路径
   if (targetPath === store.activeTab) {
     const currentIndex = tabsList.findIndex((tab) => tab.path === targetPath);
-    // 优先选择左边的标签页，否则选择右边的
     const nextTab = tabsList[currentIndex - 1] || tabsList[currentIndex + 1];
     if (nextTab) {
       newActivePath = nextTab.path;
     }
   }
 
-  // 从 store 中移除标签页
   store.removeTab(targetPath);
 
-  // 如果需要，切换到新的激活标签页
   if (newActivePath !== route.path) {
     router.push(newActivePath).then(() => {
       store.setActiveTab(newActivePath);
@@ -56,6 +109,7 @@ watch(
   { immediate: true },
 );
 </script>
+
 <template>
   <div class="tabs-container">
     <el-tabs
@@ -69,15 +123,27 @@ watch(
       <el-tab-pane
         v-for="item in store.tabs"
         :key="item.path"
-        :label="item.title"
         :name="item.path"
         :closable="item.closable"
-      />
+      >
+        <template #label>
+          <span @contextmenu.prevent="openMenu($event, item.path)">
+            {{ item.title }}
+          </span>
+        </template>
+      </el-tab-pane>
     </el-tabs>
+
+    <ul v-if="menuVisible" class="context-menu" :style="menuStyle">
+      <li @click="handleCloseCurrent">关闭当前</li>
+      <li @click="handleCloseOthers">关闭其他</li>
+      <li @click="handleCloseAll">关闭所有</li>
+    </ul>
   </div>
 </template>
 
 <style lang="scss" scoped>
+/* ... 此前的样式保持不变 ... */
 .tabs-container {
   padding: 12px 20px;
   background-color: #f8f9fa;
@@ -146,6 +212,30 @@ watch(
 
   :deep(.el-tabs__active-bar) {
     display: none;
+  }
+}
+/* 新增：右键菜单样式 */
+.context-menu {
+  position: fixed;
+  z-index: 3000;
+  padding: 8px 0;
+  list-style-type: none;
+  background-color: #fff;
+  border: 1px solid #e4e7ed;
+  border-radius: 6px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+
+  li {
+    padding: 8px 16px;
+    font-size: 14px;
+    color: #606266;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+      color: var(--el-color-primary);
+      background-color: #f5f7fa;
+    }
   }
 }
 </style>
