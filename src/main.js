@@ -6,7 +6,7 @@ import globalComponent from "./components/index";
 
 import "@/styles/index.scss";
 
-import { setupStore } from "@/store/idnex";
+import { setupStore } from "@/store/index.js";
 
 import router from "@/router";
 

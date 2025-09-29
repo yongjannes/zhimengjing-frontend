@@ -8,7 +8,7 @@ const router = useRouter();
 const userStore = useUserStore();
 
 const loginForm = ref({
-  username: "admin",
+  username: "superadmin",
   password: "123456",
   captcha: "",
   captchaKey: "",

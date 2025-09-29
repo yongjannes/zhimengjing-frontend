@@ -52,10 +52,11 @@ export const asyncRoutes = [
   },
   {
     path: "/dream",
+    name: "DreamLayout",
     component: () => import("@/layout/index.vue"), // 单级菜单同样需要布局组件，以确保显示在主框架内
     children: [
       {
-        path: "", // path 为空，意味着访问 /dream 时就渲染此组件
+        path: "",
         name: "DreamManagement",
         component: () => import("@/views/dream/index.vue"),
         meta: { title: "梦境管理", icon: "Moon", permission: "dream:manage" },
@@ -64,6 +65,7 @@ export const asyncRoutes = [
   },
   {
     path: "/community",
+    name: "CommunityLayout",
     component: () => import("@/layout/index.vue"),
     children: [
       {

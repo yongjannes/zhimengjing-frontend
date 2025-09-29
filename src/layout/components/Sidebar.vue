@@ -16,8 +16,8 @@ const menuRoutes = computed(() => permissionStore.routes);
       <h1 v-if="!settingStore.isCollapse" class="title">织梦境</h1>
     </div>
     <el-menu
-      active-text-color="#ffd04b"
-      background-color="#304156"
+      active-text-color="var(--el-color-primary)"
+      background-color="#4f83cc"
       class="el-menu-vertical"
       :default-active="$route.path"
       text-color="#fff"
@@ -77,6 +77,7 @@ const menuRoutes = computed(() => permissionStore.routes);
 /* 菜单整体 */
 .el-menu {
   flex: 1;
+  height: 100%;
   overflow-y: auto;
   background: linear-gradient(180deg, #4f83cc, #79a9f0);
   border-right: none;
@@ -121,7 +122,7 @@ const menuRoutes = computed(() => permissionStore.routes);
 
   &.is-active {
     color: #fff !important;
-    background: linear-gradient(90deg, #3b82f6, #22c55e);
+    background: var(--el-color-primary) !important; /* 修正 */
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
   }
 
@@ -167,7 +168,7 @@ const menuRoutes = computed(() => permissionStore.routes);
 
   &.is-active > .el-sub-menu__title {
     color: #fff;
-    background: linear-gradient(90deg, #3b82f6, #22c55e);
+    background: var(--el-color-primary) !important; /* 修正 */
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 
     .el-icon {
@@ -191,7 +192,7 @@ const menuRoutes = computed(() => permissionStore.routes);
 
     &.is-active {
       color: #fff !important;
-      background: linear-gradient(90deg, #3b82f6, #22c55e);
+      background: var(--el-color-primary) !important; /* 修正 */
       box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
     }
   }

@@ -119,11 +119,12 @@ watch(
     &.is-active {
       font-weight: 600;
       color: #ffffff;
-      background-color: #4361ee;
+      background-color: var(--el-color-primary);
       box-shadow: 0 2px 5px rgba(67, 97, 238, 0.3);
 
       &:hover {
-        background-color: #3a56d4;
+        background-color: var(--el-color-primary);
+        filter: brightness(0.95);
       }
     }
 

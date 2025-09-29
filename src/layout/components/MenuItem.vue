@@ -17,7 +17,10 @@ defineProps(["menuList"]);
 
     <!-- 有子路由但是只有一个子路由 -->
     <template v-if="item.children && item.children.length == 1">
-      <el-menu-item v-if="!item.children[0].meta.hidden" :index="item.children[0].path">
+      <el-menu-item
+        v-if="!item.children[0].meta.hidden"
+        :index="item.children[0].path || item.path"
+      >
         <el-icon>
           <component :is="item.children[0].meta.icon" />
         </el-icon>

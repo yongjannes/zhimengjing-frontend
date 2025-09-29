@@ -12,6 +12,7 @@ const settingStore = useSettingStore();
 <template>
   <div class="app-wrapper" :class="{ 'sidebar-collapse': settingStore.isCollapse }">
     <Sidebar class="sidebar-container" />
+
     <div class="main-container">
       <Navbar />
       <Tabs />
@@ -23,38 +24,47 @@ const settingStore = useSettingStore();
 <style lang="scss" scoped>
 .app-wrapper {
   position: relative;
+  display: flex;
   width: 100%;
-  height: 100%;
+  height: 100vh;
 }
 
-/* 侧边栏样式 */
+/* 侧边栏样式 - 基本不变，但高度由flex自动管理 */
 .sidebar-container {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
   z-index: 1001;
+  // 防止侧边栏被压缩
+  flex-shrink: 0;
   width: 210px !important;
-  height: 100%;
   overflow: hidden;
-  background-color: #acc9ef;
+  box-shadow: 2px 0 8px 0 rgba(29, 35, 41, 0.05);
   transition: width 0.28s;
 }
 
-/* 主内容区样式 */
+/* 主内容区样式 - 核心修改区 */
 .main-container {
-  position: relative;
-  min-height: 100%;
-  margin-left: 210px; /* 留出左侧菜单的宽度 */
+
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+
+  //防止整个 main-container 滚动
+  overflow: hidden;
   transition: margin-left 0.28s;
 }
 
+/* stylelint-disable selector-type-no-unknown */
+.main-container > AppMain {
+  flex: 1;
+  // 允许内容滚动
+  overflow-y: auto;
+  // 可以加个平滑滚动
+  scroll-behavior: smooth;
+}
+
 .sidebar-collapse {
-  /* 折叠时，侧边栏容器宽度变小 */
   .sidebar-container {
     width: 64px !important;
   }
-  /* 折叠时，主内容区的左边距也变小 */
   .main-container {
     margin-left: 64px;
   }
