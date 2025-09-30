@@ -10,8 +10,7 @@
 .app-main {
   position: relative;
   width: 100%;
-
-  padding: 20px;
+  padding: 0px 20px 0px 20px;
 
   background-color: #f0f2f5;
 }

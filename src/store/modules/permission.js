@@ -67,7 +67,6 @@ export const usePermissionStore = defineStore(
       accessedRoutes.forEach((route) => {
         if (!router.hasRoute(route.name)) {
           router.addRoute(route);
-          console.log(`动态添加路由：${route.name}`);
         }
       });
 

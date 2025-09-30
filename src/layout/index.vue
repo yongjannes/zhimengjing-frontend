@@ -3,7 +3,6 @@ import Sidebar from "./components/Sidebar.vue";
 import Navbar from "./components/Navbar.vue";
 import AppMain from "./components/AppMain.vue";
 import Tabs from "./components/Tabs.vue";
-import Footer from "./components/Footer.vue";
 
 import { useSettingStore } from "@/store/modules/setting";
 
@@ -18,7 +17,7 @@ const settingStore = useSettingStore();
       <Navbar />
       <Tabs />
       <AppMain />
-      <Footer />
+      <!--      <Footer />-->
     </div>
   </div>
 </template>
@@ -28,6 +27,7 @@ const settingStore = useSettingStore();
   position: relative;
   width: 100%;
   height: 100vh;
+  overflow: hidden;
 }
 
 /* 侧边栏样式 */
@@ -47,19 +47,14 @@ const settingStore = useSettingStore();
 .main-container {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100%;
   margin-left: 210px; /* 2. 添加默认的左边距，为展开的侧边栏留出空间 */
   transition: margin-left 0.28s;
 }
 
-.main-container > .app-main {
-  flex-grow: 1;
-  overflow-y: auto;
-  scroll-behavior: smooth;
-}
 .main-container > .footer {
   flex-shrink: 0;
-  height: 50px;
+  height: 30px;
   background: #f0f0f0;
 }
 

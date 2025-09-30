@@ -3,10 +3,9 @@ import request from "@/utils/request";
 const AuthAPI = {
   // 登录接口
   login(username, password, captcha, captchaKey) {
-    // 调用封装好的 request 方法发送 POST 请求
     return request({
-      url: "/admin/auth/login", // 请求的接口地址
-      method: "POST", // 请求方法为 POST
+      url: "/admin/auth/login",
+      method: "POST",
       data: {
         username,
         password,
@@ -16,7 +15,7 @@ const AuthAPI = {
     });
   },
 
-  //获取图形验证码接口
+  // 获取图形验证码接口
   getCaptcha(captchaId) {
     return request({
       url: "/captcha/graph-captcha",
@@ -34,11 +33,20 @@ const AuthAPI = {
       method: "GET",
     });
   },
+
   // 退出登录
   logout() {
     return request({
       url: "/admin/auth/logout",
       method: "POST",
+    });
+  },
+
+  // 重置管理员密码
+  resetPassword(adminId) {
+    return request({
+      url: `/admin/auth/resetPassword/${adminId}`,
+      method: "PUT",
     });
   },
 };

@@ -27,17 +27,17 @@ request.interceptors.request.use(
 request.interceptors.response.use(
   (response) => {
     const resData = response?.data;
-    if (resData?.code === 200) {
-      return resData.data;
-    } else {
+    if (resData?.code !== 200) {
       ElMessage.error(resData?.message || "业务处理失败");
       return Promise.reject({
         message: resData?.message || "业务处理失败",
         code: resData?.code,
       });
     }
+    return resData.data;
   },
   (error) => {
+    const responseData = error?.response?.data;
     const status = error?.response?.status;
     let msg = "";
 
@@ -45,7 +45,7 @@ request.interceptors.response.use(
       switch (status) {
         case 401:
           const userStore = useUserStore();
-          msg = "登录状态失效，请重新登录";
+          msg = responseData?.message || "登录状态失效，请重新登录";
           if (!document.querySelector(".el-message-box__wrapper")) {
             ElMessageBox.confirm(msg, "系统提示", {
               confirmButtonText: "重新登录",
@@ -65,18 +65,20 @@ request.interceptors.response.use(
           }
           break;
         case 403:
-          msg = "无权访问";
+          msg = responseData?.message || "无权访问";
           break;
         case 404:
-          msg = "请求地址错误";
+          msg = responseData?.message || "请求地址错误";
           break;
         case 500:
-          msg = "服务器出现问题";
+          msg = responseData?.message || "服务器出现问题";
           break;
         default:
-          msg = `未知错误: ${status}`;
+          msg = responseData?.message || `未知错误: ${status}`;
       }
-      ElMessage.error(msg);
+      if (status !== 401) {
+        ElMessage.error(msg);
+      }
     } else if (error?.code === "ECONNABORTED") {
       msg = "请求超时，请稍后重试";
       ElMessage.error(msg);

@@ -105,6 +105,7 @@ onMounted(() => {
                 v-model="loginForm.captcha"
                 placeholder="请输入验证码"
                 class="custom-input"
+                @keyup.enter="handleLogin"
               />
               <el-icon class="input-icon"><i-ep-Key /></el-icon>
             </div>
