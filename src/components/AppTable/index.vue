@@ -21,6 +21,14 @@ const props = defineProps({
   paginationAlign: { type: String, default: "center" },
   // 导出Excel文件名
   excelName: { type: String, default: "table" },
+  // 是否显示列控制按钮
+  showColumnControl: { type: Boolean, default: true },
+  // 是否显示导出按钮
+  showExport: { type: Boolean, default: true },
+  // 操作列宽度
+  actionsColWidth: { type: Number, default: 200 },
+  // 表格key
+  tableKey: { type: String, default: "default-table" },
 });
 
 // 定义组件触发的事件
@@ -60,7 +68,7 @@ const handlePageSizeChange = (val) => {
 
 // --- 列控制功能 ---
 // 本地存储键名
-const STORAGE_KEY = "app_table_column_visibility";
+const STORAGE_KEY = computed(() => `app_table_column_visibility_${props.tableKey}`);
 // 存储列可见性状态
 const columnVisibility = ref({});
 
@@ -71,7 +79,7 @@ const toggleableColumns = computed(() => {
 
 // 初始化列可见性状态
 const initColumnVisibility = () => {
-  const saved = localStorage.getItem(STORAGE_KEY);
+  const saved = localStorage.getItem(STORAGE_KEY.value);
   const savedObj = saved ? JSON.parse(saved) : {};
 
   props.columns.forEach((col) => {
@@ -91,7 +99,7 @@ onMounted(initColumnVisibility);
 const toggleColumn = (prop) => {
   columnVisibility.value[prop] = !columnVisibility.value[prop];
   // 保存到本地存储
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(columnVisibility.value));
+  localStorage.setItem(STORAGE_KEY.value, JSON.stringify(columnVisibility.value));
 };
 
 // 导出Excel功能
@@ -133,17 +141,13 @@ const exportExcel = () => {
 
 <template>
   <div class="app-table-container">
-    <!-- 工具栏 -->
     <div class="toolbar" style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px">
-      <!-- 自定义工具栏插槽 -->
       <slot name="toolbar" />
 
-      <!-- 列控制下拉菜单 -->
-      <el-dropdown>
+      <el-dropdown v-if="showColumnControl">
         <el-button type="primary" size="small">列控制</el-button>
         <template #dropdown>
           <el-dropdown-menu>
-            <!-- 遍历所有可切换列 -->
             <el-dropdown-item v-for="col in toggleableColumns" :key="col.prop">
               <el-checkbox
                 :model-value="columnVisibility[col.prop]"
@@ -156,11 +160,11 @@ const exportExcel = () => {
         </template>
       </el-dropdown>
 
-      <!-- 导出Excel按钮 -->
-      <el-button type="success" size="small" @click="exportExcel">导出 Excel</el-button>
+      <el-button v-if="showExport" type="success" size="small" @click="exportExcel"
+        >导出 Excel</el-button
+      >
     </div>
 
-    <!-- 表格主体 -->
     <el-table
       v-loading="loading"
       :data="data"
@@ -171,7 +175,6 @@ const exportExcel = () => {
       @row-click="(row) => emit('row-click', row)"
       @sort-change="(sort) => emit('sort-change', sort)"
     >
-      <!-- 选择列 -->
       <el-table-column
         v-if="columns.find((c) => c.type === 'selection')"
         type="selection"
@@ -179,7 +182,6 @@ const exportExcel = () => {
         align="center"
       />
 
-      <!-- 索引列 -->
       <el-table-column
         v-if="columns.find((c) => c.type === 'index')"
         type="index"
@@ -188,7 +190,6 @@ const exportExcel = () => {
         align="center"
       />
 
-      <!-- 普通列 -->
       <template v-for="col in columns" :key="col.prop">
         <el-table-column
           v-if="
@@ -202,44 +203,61 @@ const exportExcel = () => {
           show-overflow-tooltip
         >
           <template #default="{ row, column }">
-            <!-- 自定义插槽 -->
             <slot v-if="col.slot" :name="col.slot" :row="row" />
-            <!-- 自定义格式化函数 -->
             <span v-else-if="col.formatter">{{ col.formatter(row, column, row[col.prop]) }}</span>
-            <!-- 默认显示值 -->
             <span v-else>{{ row[col.prop] }}</span>
           </template>
         </el-table-column>
       </template>
 
-      <!-- 操作列 -->
-      <el-table-column v-if="$slots.actions" label="操作" align="center" fixed="right" width="200">
+      <el-table-column
+        v-if="$slots.actions"
+        label="操作"
+        align="center"
+        fixed="right"
+        :width="actionsColWidth"
+      >
         <template #default="{ row }">
           <slot name="actions" :row="row" />
         </template>
       </el-table-column>
 
-      <!-- 空数据插槽 -->
       <template #empty>
         <slot name="empty">
           <el-empty description="暂无数据" />
         </slot>
       </template>
     </el-table>
-
-    <!-- 分页组件 -->
-    <el-pagination
-      v-if="total > 0"
-      v-model:current-page="currentPage"
-      v-model:page-size="currentPageSize"
-      class="pagination"
-      :page-sizes="[10, 20, 50, 100]"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="total"
-      :class="`align-${props.paginationAlign}`"
-      style="margin-top: 15px"
-      @size-change="handlePageSizeChange"
-      @current-change="handlePageChange"
-    />
+    <div :class="`pagination align-${paginationAlign}`">
+      <el-pagination
+        v-if="total > 0"
+        v-model:current-page="currentPage"
+        v-model:page-size="currentPageSize"
+        class="pagination"
+        :page-sizes="[5, 10, 20, 50]"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
+        style="margin-top: 15px"
+        @size-change="handlePageSizeChange"
+        @current-change="handlePageChange"
+      />
+    </div>
   </div>
 </template>
+
+<style scoped lang="scss">
+.pagination {
+  display: flex;
+  margin-top: 15px;
+
+  &.align-left {
+    justify-content: flex-start;
+  }
+  &.align-center {
+    justify-content: center;
+  }
+  &.align-right {
+    justify-content: flex-end;
+  }
+}
+</style>

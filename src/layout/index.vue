@@ -26,13 +26,12 @@ const settingStore = useSettingStore();
 .app-wrapper {
   position: relative;
   width: 100%;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
 }
 
 /* 侧边栏样式 */
 .sidebar-container {
-  position: fixed; /* 1. 改为固定定位，脱离文档流 */
+  position: fixed;
   top: 0;
   left: 0;
   z-index: 1001;
@@ -47,8 +46,8 @@ const settingStore = useSettingStore();
 .main-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  margin-left: 210px; /* 2. 添加默认的左边距，为展开的侧边栏留出空间 */
+  min-height: 100vh;
+  margin-left: 210px;
   transition: margin-left 0.28s;
 }
 

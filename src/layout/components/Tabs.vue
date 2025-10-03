@@ -143,8 +143,11 @@ watch(
 </template>
 
 <style lang="scss" scoped>
-/* ... 此前的样式保持不变 ... */
 .tabs-container {
+  position: sticky; // 新增：粘性定位
+  top: 60px; // 新增：粘在Navbar下方（60px是Navbar高度）
+  z-index: 99; // 新增：比Navbar略低
+  flex-shrink: 0; // 新增：不允许收缩
   padding: 12px 20px;
   background-color: #f8f9fa;
   border-bottom: 1px solid #e9ecef;

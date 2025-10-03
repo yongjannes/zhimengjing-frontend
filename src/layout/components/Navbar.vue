@@ -96,8 +96,11 @@ const handleLogout = async () => {
 
 <style lang="scss" scoped>
 .navbar {
-  position: relative;
+  position: sticky;
+  top: 0;
+  z-index: 100;
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: space-between;
   height: 60px;
