@@ -137,7 +137,7 @@ const handleResetPassword = async (row) => {
       type: "warning",
     });
     const res = await AuthAPI.resetPassword(row.id);
-    ElMessage.success(`重置成功，新密码为: ${res}`);
+    ElMessage.success(` ${res}`);
   } catch (error) {
     console.error("重置密码失败:", error);
   }

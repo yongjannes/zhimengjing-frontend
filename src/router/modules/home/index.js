@@ -1,3 +1,4 @@
+import profileRoute from "../profile";
 export const constantRoutes = [
   {
     path: "/login",
@@ -19,6 +20,7 @@ export const constantRoutes = [
       },
     ],
   },
+  profileRoute,
   // 404 页面、500 页面等也应放在这里
 ];
 

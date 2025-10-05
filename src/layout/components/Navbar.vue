@@ -7,6 +7,7 @@ import { useUserStore } from "@/store/modules/user";
 const settingStore = useSettingStore();
 const route = useRoute();
 const userStore = useUserStore();
+const isDropdownActive = ref(false);
 
 // 刷新页面
 const handleRefresh = () => {
@@ -43,6 +44,10 @@ const handleLogout = async () => {
     // 用户点击了取消或关闭弹窗，不做任何操作
   }
 };
+
+const handleVisibleChange = (visible) => {
+  isDropdownActive.value = visible;
+};
 </script>
 
 <template>
@@ -78,15 +83,24 @@ const handleLogout = async () => {
         <el-icon><i-ep-full-screen /></el-icon>
       </div>
       <Settings />
-      <el-dropdown trigger="click">
+      <el-dropdown trigger="click" @visible-change="handleVisibleChange">
         <span class="avatar-wrapper">
           <img :src="userStore.userInfo?.avatar" class="user-avatar" alt="用户头像" />
           <span class="user-name">{{ userStore.userInfo?.username || "用户" }}</span>
-          <el-icon class="el-icon--right"><i-ep-arrow-down /></el-icon>
+          <el-icon class="el-icon--right" :class="{ 'is-active': isDropdownActive }">
+            <i-ep-arrow-down />
+          </el-icon>
         </span>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item @click="handleLogout">退出登录</el-dropdown-item>
+            <el-dropdown-item @click="$router.push('/profile')">
+              <el-icon><i-ep-user /></el-icon>
+              <span style="margin-left: 8px">个人中心</span>
+            </el-dropdown-item>
+            <el-dropdown-item divided @click="handleLogout">
+              <el-icon><i-ep-switch-button /></el-icon>
+              <span style="margin-left: 8px">退出登录</span>
+            </el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -163,6 +177,15 @@ const handleLogout = async () => {
     cursor: pointer;
     border-radius: 8px;
     transition: all 0.3s ease;
+    .el-icon--right {
+      margin-left: 5px;
+      color: var(--el-text-color-regular);
+      transition: transform 0.3s;
+
+      &.is-active {
+        transform: rotate(180deg);
+      }
+    }
 
     &:hover {
       background-color: var(--el-color-primary-light-9);
@@ -188,11 +211,6 @@ const handleLogout = async () => {
       font-size: 14px;
       color: var(--el-text-color-regular);
       white-space: nowrap;
-    }
-
-    .el-icon--right {
-      margin-left: 5px;
-      color: var(--el-text-color-regular);
     }
   }
 
