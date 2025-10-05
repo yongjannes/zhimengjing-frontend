@@ -8,7 +8,6 @@ const settingStore = useSettingStore();
 const route = useRoute();
 const userStore = useUserStore();
 const isDropdownActive = ref(false);
-
 // 刷新页面
 const handleRefresh = () => {
   window.location.reload();
@@ -85,7 +84,7 @@ const handleVisibleChange = (visible) => {
       <Settings />
       <el-dropdown trigger="click" @visible-change="handleVisibleChange">
         <span class="avatar-wrapper">
-          <img :src="userStore.userInfo?.avatar" class="user-avatar" alt="用户头像" />
+          <img :src="userStore.avatar" class="user-avatar" alt="用户头像" />
           <span class="user-name">{{ userStore.userInfo?.username || "用户" }}</span>
           <el-icon class="el-icon--right" :class="{ 'is-active': isDropdownActive }">
             <i-ep-arrow-down />

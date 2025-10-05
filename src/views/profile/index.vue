@@ -106,7 +106,23 @@ const getProfile = async () => {
     profileForm.realName = data.realName || "";
     profileForm.email = data.email || "";
     profileForm.phone = data.phone || "";
-    profileForm.avatar = data.avatar || "";
+    if (data.avatar) {
+      try {
+        const avatarUrl = await UploadAPI.getFileUrl(data.avatar);
+        // 将获取到的URL同时更新到用于显示的 profileInfo 和用于表单的 profileForm
+        profileInfo.value.avatar = avatarUrl;
+        profileForm.avatar = avatarUrl;
+      } catch (urlError) {
+        console.error("获取头像URL失败:", urlError);
+        // 如果获取URL失败，可以设置一个默认头像或留空
+        profileInfo.value.avatar = ""; // 或者一个默认图片URL
+        profileForm.avatar = "";
+      }
+    } else {
+      // 如果用户没有头像，则清空
+      profileInfo.value.avatar = "";
+      profileForm.avatar = "";
+    }
   } catch (error) {
     ElMessage.error(error.message || "获取个人信息失败");
   } finally {

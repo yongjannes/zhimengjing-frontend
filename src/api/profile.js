@@ -61,6 +61,12 @@ const ProfileAPI = {
       },
     });
   },
+  refreshAvatar() {
+    return request({
+      url: "/api/admin/profile/refresh-avatar",
+      method: "get",
+    });
+  },
 };
 
 export default ProfileAPI;

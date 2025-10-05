@@ -32,6 +32,17 @@ router.beforeEach(async (to, from, next) => {
       // 如果已登录访问登录页，重定向到首页
       next({ path: "/" });
     } else {
+      const now = Date.now();
+      if (
+        userStore.avatarUrl &&
+        userStore.avatarExpiresAt &&
+        userStore.avatarExpiresAt - now < 5 * 60 * 1000
+      ) {
+        // 静默调用刷新action，这个过程不影响下面的路由逻辑
+        userStore.refreshAvatarUrl().catch((err) => {
+          console.error("Silent refresh avatar failed:", err);
+        });
+      }
       // 判断用户信息是否存在
       if (userStore.userInfo) {
         // 用户信息存在

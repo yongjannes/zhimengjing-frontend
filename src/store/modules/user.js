@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import AuthAPI from "@/api/auth";
+import ProfileAPI from "@/api/profile";
 import { usePermissionStore } from "@/store/modules/permission";
 import router from "@/router/index.js";
 
@@ -8,8 +9,16 @@ export const useUserStore = defineStore(
   () => {
     const token = ref(null);
     const userInfo = ref(null);
+
+    const avatarUrl = ref(null);
+    const avatarExpiresAt = ref(0);
+
     const isLoggedIn = computed(() => !!token.value);
 
+    const avatar = computed(
+      () =>
+        avatarUrl.value || "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
+    );
     function setLoginState(loginResult) {
       token.value = loginResult.token || null;
     }
@@ -17,6 +26,8 @@ export const useUserStore = defineStore(
     function clearLoginState() {
       token.value = null;
       userInfo.value = null;
+      avatarUrl.value = null;
+      avatarExpiresAt.value = 0;
     }
 
     const login = async (payload) => {
@@ -42,10 +53,31 @@ export const useUserStore = defineStore(
       try {
         const response = await AuthAPI.getInfo();
         userInfo.value = response;
+        if (response.avatar && response.avatar.url) {
+          avatarUrl.value = response.avatar.url;
+          avatarExpiresAt.value = response.avatar.expiresAt;
+        } else {
+          avatarUrl.value = null;
+          avatarExpiresAt.value = 0;
+        }
         return response;
       } catch (error) {
         console.error("获取用户信息失败:", error);
         return null;
+      }
+    };
+
+    const refreshAvatarUrl = async () => {
+      try {
+        console.log("Refreshing avatar URL silently...");
+        const response = await ProfileAPI.refreshAvatar();
+        if (response && response.url && response.expiresAt) {
+          avatarUrl.value = response.url;
+          avatarExpiresAt.value = response.expiresAt;
+          console.log("Avatar URL refreshed successfully.");
+        }
+      } catch (error) {
+        console.error("Failed to refresh avatar URL:", error);
       }
     };
 
@@ -68,15 +100,19 @@ export const useUserStore = defineStore(
       token,
       userInfo,
       isLoggedIn,
+      avatar,
+      avatarUrl,
+      avatarExpiresAt,
       login,
       getInfo,
       logout,
+      refreshAvatarUrl,
     };
   },
   {
     persist: {
       key: "userStore",
-      paths: ["token", "userInfo"],
+      paths: ["token", "userInfo", "avatarUrl", "avatarExpiresAt"],
     },
   },
 );
