@@ -12,7 +12,7 @@ const router = createRouter({
 });
 
 // 白名单，不需要登录即可访问的路径
-const whiteList = ["/login"];
+const whiteList = ["/login", "/forgot-password"];
 
 // 动态路由添加标记
 let isAddRoutes = false;

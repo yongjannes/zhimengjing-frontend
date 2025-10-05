@@ -49,6 +49,29 @@ const AuthAPI = {
       method: "PUT",
     });
   },
+  // 发送忘记密码验证码
+  sendForgotPasswordCode(identifier) {
+    return request({
+      url: "/admin/auth/forgot-password/send-code",
+      method: "POST",
+      data: {
+        identifier,
+      },
+    });
+  },
+
+  // 通过验证码重置密码
+  resetPasswordByCaptcha(email, captcha, newPassword) {
+    return request({
+      url: "/admin/auth/forgot-password/reset",
+      method: "POST",
+      data: {
+        email,
+        captcha,
+        newPassword,
+      },
+    });
+  },
 };
 
 export default AuthAPI;

@@ -21,6 +21,15 @@ export const constantRoutes = [
     ],
   },
   profileRoute,
+  {
+    path: "/forgot-password",
+    name: "ForgotPassword",
+    component: () => import("@/views/ForgotPassword/index.vue"),
+    meta: {
+      title: "忘记密码",
+      hidden: true,
+    },
+  },
   // 404 页面、500 页面等也应放在这里
 ];
 

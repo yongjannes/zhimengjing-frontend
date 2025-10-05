@@ -128,6 +128,9 @@ onMounted(() => {
             <span v-if="!loading">登 录</span>
             <span v-else>登录中...</span>
           </el-button>
+          <div class="extra-actions">
+            <el-link type="primary" @click="$router.push('/forgot-password')"> 忘记密码？ </el-link>
+          </div>
         </div>
       </el-form>
     </div>
@@ -329,5 +332,9 @@ onMounted(() => {
     width: 100%;
     height: 55px;
   }
+}
+.extra-actions {
+  margin-top: 16px;
+  text-align: center;
 }
 </style>

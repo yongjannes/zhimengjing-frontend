@@ -38,6 +38,29 @@ const ProfileAPI = {
       },
     });
   },
+
+  // 发送修改邮箱验证码
+  sendChangeEmailCode(newEmail) {
+    return request({
+      url: "/admin/profile/email/send-code",
+      method: "POST",
+      data: {
+        newEmail,
+      },
+    });
+  },
+
+  // 修改邮箱
+  changeEmail(newEmail, captcha) {
+    return request({
+      url: "/admin/profile/email",
+      method: "PUT",
+      data: {
+        newEmail,
+        captcha,
+      },
+    });
+  },
 };
 
 export default ProfileAPI;

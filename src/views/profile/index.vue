@@ -291,6 +291,112 @@ const handleHeaderAvatarClick = () => {
     avatarUploaderRef.value.$el.querySelector("input").click();
   }
 };
+// 修改邮箱相关
+const changeEmailDialogVisible = ref(false);
+const changeEmailForm = reactive({
+  newEmail: "",
+  captcha: "",
+});
+const changeEmailFormRef = ref(null);
+const sendEmailCodeLoading = ref(false);
+const changeEmailLoading = ref(false);
+const emailCodeCountdown = ref(0);
+let emailCodeTimer = null;
+
+// 修改邮箱表单规则
+const changeEmailRules = {
+  newEmail: [
+    { required: true, message: "请输入新邮箱", trigger: "blur" },
+    { type: "email", message: "请输入正确的邮箱格式", trigger: ["blur", "change"] },
+  ],
+  captcha: [
+    { required: true, message: "请输入验证码", trigger: "blur" },
+    { len: 6, message: "验证码必须是6位", trigger: "blur" },
+  ],
+};
+
+// 打开修改邮箱对话框
+const handleOpenChangeEmail = () => {
+  changeEmailDialogVisible.value = true;
+  changeEmailForm.newEmail = "";
+  changeEmailForm.captcha = "";
+  if (changeEmailFormRef.value) {
+    changeEmailFormRef.value.clearValidate();
+  }
+};
+
+// 发送邮箱验证码
+const handleSendEmailCode = async () => {
+  if (!changeEmailFormRef.value) return;
+
+  try {
+    await changeEmailFormRef.value.validateField("newEmail");
+
+    if (changeEmailForm.newEmail === profileInfo.value.email) {
+      ElMessage.warning("新邮箱不能与当前邮箱相同");
+      return;
+    }
+
+    sendEmailCodeLoading.value = true;
+    await ProfileAPI.sendChangeEmailCode(changeEmailForm.newEmail);
+    ElMessage.success("验证码已发送到新邮箱");
+
+    // 开始倒计时
+    emailCodeCountdown.value = 60;
+    emailCodeTimer = setInterval(() => {
+      emailCodeCountdown.value--;
+      if (emailCodeCountdown.value <= 0) {
+        clearInterval(emailCodeTimer);
+      }
+    }, 1000);
+  } catch (error) {
+    if (error && error.message) {
+      ElMessage.error(error.message || "发送验证码失败");
+    }
+  } finally {
+    sendEmailCodeLoading.value = false;
+  }
+};
+
+// 提交修改邮箱
+const handleSubmitChangeEmail = async () => {
+  if (!changeEmailFormRef.value) return;
+
+  try {
+    const valid = await changeEmailFormRef.value.validate();
+    if (!valid) return;
+
+    changeEmailLoading.value = true;
+    await ProfileAPI.changeEmail(changeEmailForm.newEmail, changeEmailForm.captcha);
+    ElMessage.success("邮箱修改成功");
+
+    // 关闭对话框
+    changeEmailDialogVisible.value = false;
+
+    // 刷新个人信息
+    await getProfile();
+    await userStore.getInfo();
+  } catch (error) {
+    ElMessage.error(error.message || "邮箱修改失败");
+  } finally {
+    changeEmailLoading.value = false;
+  }
+};
+
+// 关闭对话框时清理
+const handleCloseChangeEmailDialog = () => {
+  if (emailCodeTimer) {
+    clearInterval(emailCodeTimer);
+    emailCodeCountdown.value = 0;
+  }
+};
+
+// 组件卸载时清理定时器
+onUnmounted(() => {
+  if (emailCodeTimer) {
+    clearInterval(emailCodeTimer);
+  }
+});
 
 onMounted(() => {
   getProfile();
@@ -340,7 +446,15 @@ onMounted(() => {
               <el-input v-model="profileForm.realName" placeholder="请输入真实姓名" />
             </el-form-item>
             <el-form-item label="邮箱">
-              <el-input v-model="profileForm.email" placeholder="请输入邮箱" />
+              <div style="display: flex; gap: 10px; width: 100%">
+                <el-input
+                  v-model="profileForm.email"
+                  placeholder="请输入邮箱"
+                  disabled
+                  style="flex: 1"
+                />
+                <el-button type="primary" @click="handleOpenChangeEmail"> 修改邮箱 </el-button>
+              </div>
             </el-form-item>
             <el-form-item label="手机号">
               <el-input v-model="profileForm.phone" placeholder="请输入手机号" />
@@ -438,6 +552,57 @@ onMounted(() => {
         </el-tab-pane>
       </el-tabs>
     </el-card>
+
+    <!-- 修改邮箱对话框 -->
+    <el-dialog
+      v-model="changeEmailDialogVisible"
+      title="修改邮箱"
+      width="500px"
+      :before-close="handleCloseChangeEmailDialog"
+    >
+      <el-form
+        ref="changeEmailFormRef"
+        :model="changeEmailForm"
+        :rules="changeEmailRules"
+        label-width="100px"
+      >
+        <el-form-item label="当前邮箱">
+          <el-input :value="profileInfo.email || '未设置'" disabled />
+        </el-form-item>
+
+        <el-form-item label="新邮箱" prop="newEmail">
+          <el-input v-model="changeEmailForm.newEmail" placeholder="请输入新邮箱地址" />
+        </el-form-item>
+
+        <el-form-item label="验证码" prop="captcha">
+          <div style="display: flex; gap: 10px; width: 100%">
+            <el-input
+              v-model="changeEmailForm.captcha"
+              placeholder="请输入6位验证码"
+              maxlength="6"
+              style="flex: 1"
+            />
+            <el-button
+              :disabled="emailCodeCountdown > 0"
+              :loading="sendEmailCodeLoading"
+              style="min-width: 120px"
+              @click="handleSendEmailCode"
+            >
+              {{ emailCodeCountdown > 0 ? `${emailCodeCountdown}秒后重发` : "发送验证码" }}
+            </el-button>
+          </div>
+        </el-form-item>
+      </el-form>
+
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="changeEmailDialogVisible = false">取消</el-button>
+          <el-button type="primary" :loading="changeEmailLoading" @click="handleSubmitChangeEmail">
+            确定修改
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
