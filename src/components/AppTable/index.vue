@@ -16,7 +16,7 @@ const props = defineProps({
   // 当前页码
   pageNum: { type: Number, default: 1 },
   // 每页显示条数
-  pageSize: { type: Number, default: 10 },
+  pageSize: { type: Number, default: 5 },
   // 分页组件对齐方式
   paginationAlign: { type: String, default: "center" },
   // 导出Excel文件名
@@ -144,8 +144,12 @@ const exportExcel = () => {
     <div class="toolbar" style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px">
       <slot name="toolbar" />
 
+      <!-- 列控制 -->
       <el-dropdown v-if="showColumnControl">
-        <el-button type="primary" size="small">列控制</el-button>
+        <el-button type="primary" size="small" plain>
+          <el-icon><i-ep-Setting /></el-icon>
+          列控制
+        </el-button>
         <template #dropdown>
           <el-dropdown-menu>
             <el-dropdown-item v-for="col in toggleableColumns" :key="col.prop">
@@ -160,9 +164,11 @@ const exportExcel = () => {
         </template>
       </el-dropdown>
 
-      <el-button v-if="showExport" type="success" size="small" @click="exportExcel"
-        >导出 Excel</el-button
-      >
+      <!-- 导出 Excel -->
+      <el-button v-if="showExport" type="success" size="small" plain @click="exportExcel">
+        <el-icon><i-ep-Download /></el-icon>
+        导出 Excel
+      </el-button>
     </div>
 
     <el-table

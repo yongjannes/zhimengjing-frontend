@@ -28,15 +28,7 @@ const handleSearch = () => emit("search", formData.value);
 
 // 重置方法
 const handleReset = () => {
-  const resetVal = {};
-  props.items.forEach((item) => {
-    if (item.default !== undefined) resetVal[item.prop] = item.default;
-    else if (["daterange", "datetimerange"].includes(item.type)) resetVal[item.prop] = [];
-    else if (item.type === "multiple" || item.type === "checkbox") resetVal[item.prop] = [];
-    else resetVal[item.prop] = "";
-  });
-  emit("update:modelValue", resetVal);
-  emit("reset", resetVal);
+  emit("reset");
 };
 
 // 辅助函数：处理宽度（数字加 px，字符串直接用）

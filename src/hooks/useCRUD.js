@@ -78,7 +78,7 @@ export function useCRUD(options) {
     // 重新设置查询参数（包含默认分页参数和初始参数）
     Object.assign(queryParams, {
       pageNum: 1,
-      pageSize: 10,
+      pageSize: 5,
       ...cleanInitialState,
     });
 

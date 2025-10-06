@@ -14,6 +14,9 @@ importers:
       axios:
         specifier: ^1.11.0
         version: 1.11.0
+      dayjs:
+        specifier: ^1.11.18
+        version: 1.11.18
       element-plus:
         specifier: ^2.11.2
         version: 2.11.2(vue@3.5.21(typescript@5.9.2))
