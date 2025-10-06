@@ -3,6 +3,7 @@ import AuthAPI from "@/api/auth";
 import ProfileAPI from "@/api/profile";
 import { usePermissionStore } from "@/store/modules/permission";
 import router from "@/router/index.js";
+import { useTabsStore } from "./tabs";
 
 export const useUserStore = defineStore(
   "user",
@@ -84,6 +85,7 @@ export const useUserStore = defineStore(
     // 退出登录
     const logout = async () => {
       const permissionStore = usePermissionStore();
+      const tabsStore = useTabsStore();
       try {
         await AuthAPI.logout();
       } catch (error) {
@@ -92,6 +94,7 @@ export const useUserStore = defineStore(
         // 无论接口调用成功与否，都清空前端登录状态
         clearLoginState();
         permissionStore.resetRoutes();
+        tabsStore.closeAllTabs();
         router.replace("/login");
       }
     };
