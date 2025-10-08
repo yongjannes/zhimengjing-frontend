@@ -29,6 +29,19 @@ const props = defineProps({
   actionsColWidth: { type: Number, default: 200 },
   // 表格key
   tableKey: { type: String, default: "default-table" },
+
+  //工具栏按钮尺寸
+  toolButtonSize: {
+    type: String,
+    default: "default", // 默认尺寸
+    validator: (val) => ["large", "default", "small"].includes(val),
+  },
+  // 操作列按钮尺寸
+  actionButtonSize: {
+    type: String,
+    default: "default",
+    validator: (val) => ["large", "default", "small"].includes(val),
+  },
 });
 
 // 定义组件触发的事件
@@ -146,7 +159,7 @@ const exportExcel = () => {
 
       <!-- 列控制 -->
       <el-dropdown v-if="showColumnControl">
-        <el-button type="primary" size="small" plain>
+        <el-button type="primary" :size="toolButtonSize" plain>
           <el-icon><i-ep-Setting /></el-icon>
           列控制
         </el-button>
@@ -165,7 +178,7 @@ const exportExcel = () => {
       </el-dropdown>
 
       <!-- 导出 Excel -->
-      <el-button v-if="showExport" type="success" size="small" plain @click="exportExcel">
+      <el-button v-if="showExport" type="success" :size="toolButtonSize" plain @click="exportExcel">
         <el-icon><i-ep-Download /></el-icon>
         导出 Excel
       </el-button>
@@ -224,7 +237,7 @@ const exportExcel = () => {
         :width="actionsColWidth"
       >
         <template #default="{ row }">
-          <slot name="actions" :row="row" />
+          <slot name="actions" :row="row" :size="actionButtonSize" />
         </template>
       </el-table-column>
 
