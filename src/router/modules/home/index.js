@@ -80,6 +80,16 @@ export const asyncRoutes = [
         component: () => import("@/views/dream/category/index.vue"),
         meta: { title: "梦境分类", icon: "Grid", permission: "dream:category:manage" },
       },
+      {
+        path: "/dream/tag",
+        name: "TagManagement",
+        component: () => import("@/views/dream/tag/index.vue"),
+        meta: {
+          title: "标签管理",
+          icon: "Grid",
+          permission: "dream:tag:manage",
+        },
+      },
     ],
   },
   {
