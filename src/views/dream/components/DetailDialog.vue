@@ -84,12 +84,12 @@ watch(
         <el-descriptions-item label="标题" :span="2">{{ dreamDetail.title }}</el-descriptions-item>
 
         <el-descriptions-item label="梦境内容" :span="2">
-          <div style=" line-height: 1.6;white-space: pre-wrap">
+          <div style="line-height: 1.6; white-space: pre-wrap">
             {{ dreamDetail.content || "无" }}
           </div>
         </el-descriptions-item>
         <el-descriptions-item label="AI解析" :span="2">
-          <div style=" line-height: 1.6;white-space: pre-wrap">
+          <div style="line-height: 1.6; white-space: pre-wrap">
             {{ dreamDetail.interpretation || "无" }}
           </div>
         </el-descriptions-item>

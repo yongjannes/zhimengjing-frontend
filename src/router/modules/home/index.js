@@ -64,13 +64,21 @@ export const asyncRoutes = [
   {
     path: "/dream",
     name: "DreamLayout",
-    component: () => import("@/layout/index.vue"), // 单级菜单同样需要布局组件，以确保显示在主框架内
+    component: () => import("@/layout/index.vue"),
+    redirect: "/dream/manage",
+    meta: { title: "梦境管理", icon: "Moon", permission: "dream:manage" },
     children: [
       {
-        path: "",
+        path: "/dream/manage",
         name: "DreamManagement",
         component: () => import("@/views/dream/index.vue"),
-        meta: { title: "梦境管理", icon: "Moon", permission: "dream:manage" },
+        meta: { title: "梦境列表", icon: "Memo", permission: "dream:manage" },
+      },
+      {
+        path: "/dream/category",
+        name: "DreamCategory",
+        component: () => import("@/views/dream/category/index.vue"),
+        meta: { title: "梦境分类", icon: "Grid", permission: "dream:category:manage" },
       },
     ],
   },
