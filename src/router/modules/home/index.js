@@ -96,12 +96,14 @@ export const asyncRoutes = [
     path: "/community",
     name: "CommunityLayout",
     component: () => import("@/layout/index.vue"),
+    meta: { title: "社区管理", icon: "Communication", permission: "community:manage" },
+    redirect: "/community/post",
     children: [
       {
-        path: "",
-        name: "CommunityManagement",
-        component: () => import("@/views/community/index.vue"),
-        meta: { title: "社区管理", icon: "ChatDotSquare", permission: "community:manage" },
+        path: "/community/post",
+        name: "CommunityPost",
+        component: () => import("@/views/community/post/index.vue"),
+        meta: { title: "帖子管理", icon: "Document", permission: "community:post" },
       },
     ],
   },
